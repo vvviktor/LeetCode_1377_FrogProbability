@@ -44,23 +44,12 @@ private:
 
     std::optional<double> Jump(TreeNode* node, int jumps, double chanse, int target, TreeNode* parent) {
         if (node->id == target) {
-            if (parent != nullptr) {
-                if (node->neighbours.size() > 1) {
-                    node->color = -2;
-                    return jumps == 0 ? chanse : 0;
-                }
-                else {
-                    return chanse;
-                }
+            if ((parent != nullptr && node->neighbours.size() > 1) || (parent == nullptr && !node->neighbours.empty())) {
+                node->color = -2;
+                return jumps == 0 ? chanse : 0;
             }
             else {
-                if (!node->neighbours.empty()) {
-                    node->color = -2;
-                    return jumps == 0 ? chanse : 0;
-                }
-                else {
-                    return chanse;
-                }
+                return chanse;
             }
         }
         if (jumps == 0) {
