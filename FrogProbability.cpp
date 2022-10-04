@@ -1,6 +1,7 @@
 ﻿#include<vector>
 #include<memory>
 #include<iostream>
+#include<optional>
 
 class Solution {
     struct TreeNode {
@@ -11,7 +12,7 @@ class Solution {
     };
 
 public:
-    double frogPosition(int n, std::vector<std::vector<int>>& edges, int t, int target) {        
+    double frogPosition(int n, std::vector<std::vector<int>>& edges, int t, int target) {
         nodes_ = std::vector<std::unique_ptr<TreeNode>>(n + 1);
         if (edges.empty()) {
             if (nodes_.size() > 1 && target == 1) {
@@ -22,7 +23,7 @@ public:
             }
         }
         BuildTree(edges);
-        return Jump(nodes_[1].get(), t, 1, target, nullptr);
+        return *Jump(nodes_[1].get(), t, 1, target, nullptr);
     }
 
 private:
@@ -41,37 +42,40 @@ private:
         }
     }
 
-    double Jump(TreeNode* node, int jumps, double chanse, int target, TreeNode* parent) {
-        if (node->color == -2 || jumps < 0) {
-            return 0;
-        }
+    std::optional<double> Jump(TreeNode* node, int jumps, double chanse, int target, TreeNode* parent) {
         if (node->id == target) {
             if (parent != nullptr) {
                 if (node->neighbours.size() > 1) {
-                    return jumps == 0 ? chanse : 0;
-                }
-                else {
-                    return chanse;
-                }
-            } 
-            else {
-                if (!node->neighbours.empty()) {
+                    node->color = -2;
                     return jumps == 0 ? chanse : 0;
                 }
                 else {
                     return chanse;
                 }
             }
-        }        
-        double ret = 0;
+            else {
+                if (!node->neighbours.empty()) {
+                    node->color = -2;
+                    return jumps == 0 ? chanse : 0;
+                }
+                else {
+                    return chanse;
+                }
+            }
+        }
+        if (jumps == 0) {
+            node->color = -2;
+            return {};
+        }
+        std::optional<double> ret = {};
         if (node->color == 0) {
             int divider = parent != nullptr ? node->neighbours.size() - 1 : node->neighbours.size();
             for (auto& next_node : node->neighbours) {
-                if (next_node == parent || !next_node) {
+                if (next_node->color == -2 || next_node == parent || !next_node) {
                     continue;
                 }
                 ret = Jump(next_node, jumps - 1, chanse / divider, target, node);
-                if (ret != 0) {
+                if (ret) {
                     break;
                 }
             }
@@ -82,7 +86,7 @@ private:
 };
 
 int main() {
-    std::vector<std::vector<int>> test{{2, 1},{3, 2},{4, 1},{5, 1},{6, 4},{7, 1},{8, 7}};
+    std::vector<std::vector<int>> test{{1, 2},{1, 3},{1, 7},{2, 4},{2, 6},{3, 5}};
     Solution s;
-    std::cout << s.frogPosition(8, test, 7, 7) << '\n';
+    std::cout << s.frogPosition(7, test, 20, 6) << '\n';
 }
