@@ -68,10 +68,10 @@ private:
             return {};
         }
         std::optional<double> ret = {};
-        if (node->color == 0) {
+        if (node->color == 0 && !node->neighbours.empty()) {
             int divider = parent != nullptr ? node->neighbours.size() - 1 : node->neighbours.size();
             for (auto& next_node : node->neighbours) {
-                if (next_node->color == -2 || next_node == parent || !next_node) {
+                if (next_node->color == -2 || next_node == parent) {
                     continue;
                 }
                 ret = Jump(next_node, jumps - 1, chanse / divider, target, node);
