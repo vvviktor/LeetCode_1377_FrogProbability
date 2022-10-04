@@ -62,16 +62,9 @@ private:
                     return chanse;
                 }
             }
-        }
-        if (node->neighbours.empty()) {
-            node->color = -2;
-            return 0;
-        }
-        if (node->color == 0) {
-            node->color = -1;
-        }
+        }        
         double ret = 0;
-        if (node->color == -1) {
+        if (node->color == 0) {
             int divider = parent != nullptr ? node->neighbours.size() - 1 : node->neighbours.size();
             for (auto& next_node : node->neighbours) {
                 if (next_node == parent || !next_node) {
